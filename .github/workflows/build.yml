@@ -1,0 +1,29 @@
+name: Build Plugins
+
+on: 
+  push:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 1 */3 *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Clone
+        uses: actions/checkout@v2
+
+      - name: Build
+        run: dotnet publish -c Release src
+          
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: Artemis.Plugins.Devices.Nanoleaf
+          path: src/Artemis.Plugins.Devices.Nanoleaf/bin/x64/Release/net9.0/publish

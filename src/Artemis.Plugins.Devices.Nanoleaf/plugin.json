@@ -1,0 +1,15 @@
+{
+    "Guid": "2D67229F-D5A9-4EC0-B188-9EC608FA387A",
+    "Name": "Nanoleaf Devices",
+    "Description": "Allows Artemis to control lighting on all Nanoleaf products",
+    "Author": "jonilala796",
+    "Website": "",
+    "Repository": "",
+    "Icon": "QuestionMark",
+    "Version": "1.0.0.0",
+    "Main": "Artemis.Plugins.Devices.Nanoleaf.dll",
+    "AutoEnableProperties": true,
+    "RequiresAdmin": false,
+    "Platforms": "Windows,Linux,OSX",
+    "Api": "1.0.0"
+}
