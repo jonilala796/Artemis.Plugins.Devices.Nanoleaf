@@ -52,7 +52,10 @@ public class NanoleafConfigurationDialogViewModel : PluginConfigurationViewModel
         DeviceDefinition device = new();
         if (await _windowService.ShowDialogAsync<DeviceConfigurationDialogViewModel, DeviceDialogResult>(device) !=
             DeviceDialogResult.Save)
-            DeviceDefinitions.Remove(device);
+            return;
+        
+        _definitions.Value.Add(device);
+        DeviceDefinitions.Add(device);
     }
 
     private async Task ExecuteEditDevice(DeviceDefinition device)
