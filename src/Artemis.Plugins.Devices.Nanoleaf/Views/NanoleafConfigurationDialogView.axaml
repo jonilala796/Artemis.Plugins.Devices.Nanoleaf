@@ -32,7 +32,12 @@
                     <DataGridTextColumn Width="*"
                                         Binding="{Binding Model, FallbackValue='-'}"
                                         Header="Model"
-                                        IsReadOnly="True" />
+                                        IsReadOnly="True" />                    
+                    <DataGridTextColumn Width="*"
+                                        Binding="{Binding AuthToken, FallbackValue='-'}"
+                                        Header="AuthToken"
+                                        IsReadOnly="True"
+                                        />
                     <DataGridTemplateColumn Width="Auto" IsReadOnly="True">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
