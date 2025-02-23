@@ -23,7 +23,7 @@ public static class NanoleafAPI
         using HttpClient client = new();
         try
         {
-            return client.Send(new HttpRequestMessage(HttpMethod.Get, $"http://{address}/api/v1/{authToken}/"))
+            return client.Send(new HttpRequestMessage(HttpMethod.Get, $"http://{address}:16021/api/v1/{authToken}/"))
                 .Content
                 .ReadFromJsonAsync<NanoleafInfo>()
                 .Result;
@@ -42,7 +42,7 @@ public static class NanoleafAPI
         using HttpClient client = new();
         try
         {
-            var request = new HttpRequestMessage(HttpMethod.Put, $"http://{address}/api/v1/{authToken}/effects")
+            var request = new HttpRequestMessage(HttpMethod.Put, $"http://{address}:16021/api/v1/{authToken}/effects")
             {
                 Content = JsonContent.Create(new
                 {
