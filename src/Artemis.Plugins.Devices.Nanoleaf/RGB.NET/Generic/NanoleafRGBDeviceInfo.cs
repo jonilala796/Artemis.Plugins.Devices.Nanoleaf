@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Artemis.Plugins.Devices.Nanoleaf.RGB.NET.API;
 using Artemis.Plugins.Devices.Nanoleaf.RGB.NET.Enum;
 using RGB.NET.Core;
@@ -17,6 +18,8 @@ public class NanoleafRGBDeviceInfo : IRGBDeviceInfo
     public string Model { get; }
     public object? LayoutMetadata { get; set; }
     public NanoleafInfo Info { get; }
+    
+    public Dictionary<LedId, int> LedIdToIndex = new();
 
     public NanoleafRGBDeviceInfo(NanoleafInfo info)
     {

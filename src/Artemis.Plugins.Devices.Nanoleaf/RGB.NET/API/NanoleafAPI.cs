@@ -1,5 +1,6 @@
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Artemis.Plugins.Devices.Nanoleaf.RGB.NET.Enum;
 
@@ -54,7 +55,8 @@ public static class NanoleafAPI
                 })
             };
 
-            var response = client.Send(request).Content.ReadFromJsonAsync<NanoleafExternalControlResponse>().Result;
+            var responseContent = client.Send(request).Content.ReadAsStringAsync().Result;
+            var response = string.IsNullOrWhiteSpace(responseContent) ? null : JsonSerializer.Deserialize<NanoleafExternalControlResponse>(responseContent);
             return (response?.Address ?? address, response?.Port ?? 60222);
         }
         catch

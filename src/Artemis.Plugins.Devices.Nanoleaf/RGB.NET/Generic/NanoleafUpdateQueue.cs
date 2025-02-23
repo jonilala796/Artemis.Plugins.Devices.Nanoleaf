@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net.Sockets;
 using Artemis.Plugins.Devices.Nanoleaf.RGB.NET.Enum;
 using RGB.NET.Core;
@@ -24,6 +25,8 @@ internal sealed class NanoleafDeviceUpdateQueue : UpdateQueue
     private byte[] _buffer;
 
     private readonly ExtControlVersion? _version;
+    private readonly Dictionary<LedId, int> _deviceInfoLedIdToIndex;
+    private readonly int _ledCount;
 
     #endregion
 
@@ -37,12 +40,24 @@ internal sealed class NanoleafDeviceUpdateQueue : UpdateQueue
     /// <param name="port"></param>
     /// <param name="ledCount"></param>
     /// <param name="version"></param>
-    public NanoleafDeviceUpdateQueue(IDeviceUpdateTrigger updateTrigger, string address, int port, int ledCount, ExtControlVersion? version)
+    /// <param name="deviceInfoLedIdToIndex"></param>
+    public NanoleafDeviceUpdateQueue(IDeviceUpdateTrigger updateTrigger, string address, int port, int ledCount,
+        ExtControlVersion? version, Dictionary<LedId, int> deviceInfoLedIdToIndex)
         : base(updateTrigger)
     {
         _version = version;
-        
-        _buffer = new byte[1 + (ledCount * 8)];
+        _deviceInfoLedIdToIndex = deviceInfoLedIdToIndex;
+        _ledCount = ledCount;
+
+
+        var bufferLength = version switch
+        {
+            ExtControlVersion.v1 => 1 + (ledCount * 8),
+            ExtControlVersion.v2 => 2 + (ledCount * 9),
+            _ => 1 + (ledCount * 8)
+        };
+
+        _buffer = new byte[bufferLength];
         _buffer[0] = (byte)(ledCount);
 
         _socket = new UdpClient();
@@ -84,12 +99,14 @@ internal sealed class NanoleafDeviceUpdateQueue : UpdateQueue
     {
         try
         {
-            Span<byte> data = _buffer.AsSpan()[2..];
+            Span<byte> data = _buffer.AsSpan();
+            data[0] = (byte)(_ledCount);
             foreach ((object key, Color color) in dataSet)
             {
-                int ledIndex = (int)key;
-                int offset = ledIndex * 8;
-                data[offset] = (byte)ledIndex;
+                int ledIndex = ((int)key & 0x000FFFFF) - 1;
+                var ledId = _deviceInfoLedIdToIndex[(LedId)key];
+                int offset = (ledIndex * 8) + 1;
+                data[offset] = (byte)ledId;
                 data[offset + 1] = 1; // Number of frames, always 1
                 data[offset + 2] = color.GetR();
                 data[offset + 3] = color.GetG();
@@ -97,7 +114,7 @@ internal sealed class NanoleafDeviceUpdateQueue : UpdateQueue
                 data[offset + 5] = 0; // White LED element, currently ignored
                 data[offset + 6] = 0; // transitionTime 
             }
-            
+
             _socket.Send(_buffer);
 
             return true;
@@ -106,19 +123,24 @@ internal sealed class NanoleafDeviceUpdateQueue : UpdateQueue
         {
             NanoleafRGBDeviceProvider.Instance.Throw(ex);
         }
+
         return false;
     }
+
     private bool UpdateV2(ReadOnlySpan<(Object key, Color color)> dataSet)
     {
         try
         {
-            Span<byte> data = _buffer.AsSpan()[2..];
+            Span<byte> data = _buffer.AsSpan();
+            data[0] = (byte)(_ledCount >> 8); // Number of panels high byte
+            data[1] = (byte)(_ledCount & 0xFF); // Number of panels low byte
             foreach ((object key, Color color) in dataSet)
             {
-                int ledIndex = (int)key;
-                int offset = ledIndex * 9;
-                data[offset] = (byte)(ledIndex >> 8); // panelId high byte
-                data[offset + 1] = (byte)(ledIndex & 0xFF); // panelId low byte
+                int ledIndex = ((int)key & 0x000FFFFF) - 1;
+                var ledId = _deviceInfoLedIdToIndex[(LedId)key];
+                int offset = (ledIndex * 9) + 2;
+                data[offset] = (byte)(ledId >> 8); // panelId high byte
+                data[offset + 1] = (byte)(ledId & 0xFF); // panelId low byte
                 data[offset + 2] = color.GetR();
                 data[offset + 3] = color.GetG();
                 data[offset + 4] = color.GetB();

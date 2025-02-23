@@ -31,6 +31,8 @@ public class NanoleafDeviceProvider(ILogger logger, IDeviceService deviceService
 
         foreach ((string hostname, string model, string authToken) in devices)
             RgbDeviceProvider.DeviceDefinitions.Add(new NanoleafDeviceDefinition(hostname, authToken));
+        
+        deviceService.AddDeviceProvider(this);
     }
 
     public override void Disable()

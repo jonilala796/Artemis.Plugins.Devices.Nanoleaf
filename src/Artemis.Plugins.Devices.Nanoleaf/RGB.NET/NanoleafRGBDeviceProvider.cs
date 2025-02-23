@@ -93,7 +93,6 @@ public sealed class NanoleafRGBDeviceProvider : AbstractRGBDeviceProvider
     {
         NanoleafInfo? nanoleafInfo = NanoleafAPI.Info(deviceDefinition.Address, deviceDefinition.AuthToken);
         if (nanoleafInfo == null) return null;
-        if (nanoleafInfo.Effects.Select == "*ExtControl*") return null;
 
         var startExtControl = NanoleafAPI.StartExternalControl(deviceDefinition.Address, deviceDefinition.AuthToken,
             nanoleafInfo.PanelLayout.Layout.PositionData[0].ShapeType.GetExtControlVersion());
