@@ -52,8 +52,8 @@ internal sealed class NanoleafDeviceUpdateQueue : UpdateQueue
 
         var bufferLength = version switch
         {
-            ExtControlVersion.v1 => 1 + (ledCount * 8),
-            ExtControlVersion.v2 => 2 + (ledCount * 9),
+            ExtControlVersion.v1 => 1 + (ledCount * 7),
+            ExtControlVersion.v2 => 2 + (ledCount * 8),
             _ => 1 + (ledCount * 8)
         };
 
@@ -105,7 +105,7 @@ internal sealed class NanoleafDeviceUpdateQueue : UpdateQueue
             {
                 int ledIndex = ((int)key & 0x000FFFFF) - 1;
                 var ledId = _deviceInfoLedIdToIndex[(LedId)key];
-                int offset = (ledIndex * 8) + 1;
+                int offset = (ledIndex * 7) + 1;
                 data[offset] = (byte)ledId;
                 data[offset + 1] = 1; // Number of frames, always 1
                 data[offset + 2] = color.GetR();
@@ -138,7 +138,7 @@ internal sealed class NanoleafDeviceUpdateQueue : UpdateQueue
             {
                 int ledIndex = ((int)key & 0x000FFFFF) - 1;
                 var ledId = _deviceInfoLedIdToIndex[(LedId)key];
-                int offset = (ledIndex * 9) + 2;
+                int offset = (ledIndex * 8) + 2;
                 data[offset] = (byte)(ledId >> 8); // panelId high byte
                 data[offset + 1] = (byte)(ledId & 0xFF); // panelId low byte
                 data[offset + 2] = color.GetR();
