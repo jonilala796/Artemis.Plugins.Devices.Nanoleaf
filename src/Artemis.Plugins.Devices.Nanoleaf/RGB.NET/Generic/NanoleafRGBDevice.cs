@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Artemis.Plugins.Devices.Nanoleaf.RGB.NET.API;
 using Artemis.Plugins.Devices.Nanoleaf.RGB.NET.Enum;
 using Artemis.Plugins.Devices.Nanoleaf.RGB.NET.Helper;
@@ -21,6 +23,7 @@ public sealed class NanoleafRGBDevice : AbstractRGBDevice<NanoleafRGBDeviceInfo>
     private void InitializeLayout()
     {
         var positionData = DeviceInfo.Info.PanelLayout.Layout.PositionData;
+        var maxY = positionData.Max(p => p.Y);
         var i = 0;
         foreach (var position in positionData)
         {
@@ -31,10 +34,22 @@ public sealed class NanoleafRGBDevice : AbstractRGBDevice<NanoleafRGBDeviceInfo>
                     : LedId.Custom1 + i++;
                 DeviceInfo.LedIdToIndex.Add(ledId, position.PanelId);
                 var sideLength = position.ShapeType.GetSideLength() ?? 0;
-                var led = AddLed(ledId, new Point(position.X, position.Y), new Size(sideLength, sideLength));
+                var led = AddLed(ledId, new Point(position.X, maxY - position.Y), new Size(sideLength, sideLength));
                 if (led != null)
                 {
                     led.Shape = position.ShapeType.GetShape() ?? Shape.Rectangle;
+                    if (led.Shape == Shape.Custom)
+                    {
+                        led.ShapeData = position.ShapeType switch
+                        {
+                            NanoleafShapeType.Triangle => ShapeHelper.GetTriangleSvgPath(sideLength),
+                            NanoleafShapeType.ShapesHexagon => ShapeHelper.GetHexagonSvgPath(sideLength),
+                            NanoleafShapeType.ShapesTriangle => ShapeHelper.GetTriangleSvgPath(sideLength),
+                            NanoleafShapeType.ShapesMiniTriangle => ShapeHelper.GetTriangleSvgPath(sideLength),
+                            NanoleafShapeType.ElementsHexagon => ShapeHelper.GetHexagonSvgPath(sideLength),
+                            _ => throw new ArgumentOutOfRangeException()
+                        };
+                    }
                     led.Rotation = Rotation.FromDegrees(position.O);
                 }
             }
