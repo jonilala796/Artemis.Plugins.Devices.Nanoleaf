@@ -1,3 +1,4 @@
+using System;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -24,7 +25,8 @@ public static class NanoleafAPI
         using HttpClient client = new();
         try
         {
-            return client.Send(new HttpRequestMessage(HttpMethod.Get, $"http://{address}:16021/api/v1/{authToken}/"))
+            var uri = new UriBuilder("http", address, 16021, $"/api/v1/{authToken}/").Uri;
+            return client.Send(new HttpRequestMessage(HttpMethod.Get, uri))
                 .Content
                 .ReadFromJsonAsync<NanoleafInfo>()
                 .Result;
@@ -43,7 +45,8 @@ public static class NanoleafAPI
         using HttpClient client = new();
         try
         {
-            var request = new HttpRequestMessage(HttpMethod.Put, $"http://{address}:16021/api/v1/{authToken}/effects")
+            var uri = new UriBuilder("http", address, 16021, $"/api/v1/{authToken}/effects").Uri;
+            var request = new HttpRequestMessage(HttpMethod.Put, uri)
             {
                 Content = JsonContent.Create(new
                 {

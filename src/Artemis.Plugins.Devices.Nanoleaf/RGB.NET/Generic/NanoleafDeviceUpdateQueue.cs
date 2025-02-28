@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Sockets;
 using Artemis.Plugins.Devices.Nanoleaf.RGB.NET.Enum;
 using RGB.NET.Core;
@@ -49,7 +50,6 @@ internal sealed class NanoleafDeviceUpdateQueue : UpdateQueue
         _deviceInfoLedIdToIndex = deviceInfoLedIdToIndex;
         _ledCount = ledCount;
 
-
         var bufferLength = version switch
         {
             ExtControlVersion.v1 => 1 + (ledCount * 7),
@@ -60,7 +60,8 @@ internal sealed class NanoleafDeviceUpdateQueue : UpdateQueue
         _buffer = new byte[bufferLength];
         _buffer[0] = (byte)(ledCount);
 
-        _socket = new UdpClient();
+        _socket = new UdpClient(AddressFamily.InterNetworkV6);
+        _socket.Client.DualMode = true;
         _socket.Connect(address, port);
     }
 
