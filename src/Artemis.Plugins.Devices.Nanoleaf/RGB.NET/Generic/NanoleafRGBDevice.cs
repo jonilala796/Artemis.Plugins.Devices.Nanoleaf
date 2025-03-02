@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Artemis.Plugins.Devices.Nanoleaf.RGB.NET.API;
 using Artemis.Plugins.Devices.Nanoleaf.RGB.NET.Enum;
 using Artemis.Plugins.Devices.Nanoleaf.RGB.NET.Helper;
@@ -20,8 +21,9 @@ public sealed class NanoleafRGBDevice : AbstractRGBDevice<NanoleafRGBDeviceInfo>
 
     private void InitializeLayout()
     {
-        var positionData = DeviceInfo.Info.PanelLayout.Layout.PositionData;
-        var i = 0;
+        List<NanoleafInfo.PositionDataInfo> positionData = DeviceInfo.Info.PanelLayout.Layout.PositionData;
+        int maxY = positionData.Max(p => p.Y);
+        int i = 0;
         foreach (var position in positionData)
         {
             if (position.ShapeType.GetSideLength() != null && position.ShapeType.GetSideLength() > 0)
@@ -30,8 +32,8 @@ public sealed class NanoleafRGBDevice : AbstractRGBDevice<NanoleafRGBDeviceInfo>
                     ? LedId.LedStripe1 + i++
                     : LedId.Custom1 + i++;
                 DeviceInfo.LedIdToIndex.Add(ledId, position.PanelId);
-                var sideLength = position.ShapeType.GetSideLength() ?? 0;
-                var led = AddLed(ledId, new Point(position.X, position.Y), new Size(sideLength, sideLength));
+                float sideLength = position.ShapeType.GetSideLength() ?? 0;
+                var led = AddLed(ledId, new Point(position.X, maxY - position.Y), new Size(sideLength, sideLength));
                 if (led != null)
                 {
                     led.Shape = position.ShapeType.GetShape() ?? Shape.Rectangle;
