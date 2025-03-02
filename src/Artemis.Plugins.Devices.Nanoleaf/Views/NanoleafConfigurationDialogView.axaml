@@ -12,7 +12,9 @@
             <TextBlock Grid.Column="0" TextWrapping="Wrap">
                 This plugin allows you to control Nanoleaf devices.
                 <LineBreak />
-                To get started, please enter the IP address of your Nanoleaf device below.
+                To get started, please enter the IP address of your Nanoleaf device below or use the Discover button to find it automatically.
+                <LineBreak />
+                After that, you have to pair your device by clicking the Lock button
             </TextBlock>
         </Grid>
         <TextBlock Grid.Row="1" Classes="card-title">Devices</TextBlock>
@@ -46,6 +48,19 @@
                                         ToolTip.Tip="Edit device"
                                         HorizontalAlignment="Center">
                                     <avalonia:MaterialIcon Kind="Edit" />
+                                </Button>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Width="Auto" IsReadOnly="True">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Command="{Binding $parent[UserControl].DataContext.AuthenticateDevice}"
+                                        CommandParameter="{Binding}"
+                                        Classes="icon-button"
+                                        ToolTip.Tip="Authenticate device"
+                                        HorizontalAlignment="Center">
+                                    <avalonia:MaterialIcon Kind="Lock" />
                                 </Button>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>

@@ -20,4 +20,11 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
     </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Views\Dialogs\DeviceAuthenticationDialogView.axaml.cs">
+        <DependentUpon>DeviceAuthenticationDialogView.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+    </ItemGroup>
 </Project>

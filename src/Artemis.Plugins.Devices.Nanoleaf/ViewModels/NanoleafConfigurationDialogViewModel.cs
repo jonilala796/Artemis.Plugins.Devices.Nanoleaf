@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Artemis.Core;
 using Artemis.Core.Services;
 using Artemis.Plugins.Devices.Nanoleaf.Helper;
+using Artemis.Plugins.Devices.Nanoleaf.RGB.NET.API;
 using Artemis.Plugins.Devices.Nanoleaf.RGB.NET.Helper;
 using Artemis.Plugins.Devices.Nanoleaf.Settings;
 using Artemis.Plugins.Devices.Nanoleaf.ViewModels.Dialogs;
@@ -33,6 +34,7 @@ public class NanoleafConfigurationDialogViewModel : PluginConfigurationViewModel
     public ReactiveCommand<Unit, Unit> Save { get; }
     public ReactiveCommand<Unit, Unit> Cancel { get; }
     public ReactiveCommand<Unit, Unit> DiscoverDevices { get; }
+    public ReactiveCommand<DeviceDefinition, Unit> AuthenticateDevice { get; }
 
 
     public NanoleafConfigurationDialogViewModel(Plugin plugin, PluginSettings settings, IWindowService windowService,
@@ -52,19 +54,50 @@ public class NanoleafConfigurationDialogViewModel : PluginConfigurationViewModel
         Save = ReactiveCommand.Create(ExecuteSave);
         Cancel = ReactiveCommand.CreateFromTask(ExecuteCancel);
         DiscoverDevices = ReactiveCommand.CreateFromTask(ExecuteDiscoverDevices);
+        AuthenticateDevice = ReactiveCommand.CreateFromTask<DeviceDefinition>(ExecuteAuthenticateDevice);
+    }
+
+    private async Task ExecuteAuthenticateDevice(DeviceDefinition device)
+    {
+        if (!string.IsNullOrEmpty(device.AuthToken) &&
+            await _windowService.ShowConfirmContentDialog("Authentication information",
+                "You are already paired with this device."))
+            return;
+
+        if (!await _windowService.ShowConfirmContentDialog("Authentication instructions",
+                "Please press the power button on the device for 5 seconds to enter pairing mode.\r\nThen press the Pair button below.",
+                "Pair"))
+            return;
+
+        string? authToken = NanoleafAPI.Authenticate(device.Hostname);
+        if (string.IsNullOrEmpty(authToken))
+        {
+            await _windowService.ShowConfirmContentDialog("Authentication failed",
+                "Failed to authenticate with the device");
+        }
+        else
+        {
+            device.AuthToken = authToken;
+            await _windowService.ShowConfirmContentDialog("Authentication successful",
+                "You have successfully authenticated with the device");
+        }
     }
 
     private async Task ExecuteDiscoverDevices()
     {
         List<(string address, string model)> discoverDevices = NanoleafDiscoveryHelper.DiscoverDevices();
+        string message = discoverDevices.Count switch
+        {
+            0 => "No devices found",
+            1 => "1 device found",
+            _ => $"{discoverDevices.Count} devices found"
+        };
 
-        if (await _windowService
-                .ShowDialogAsync<DeviceDiscoverDialogViewModel, DiscoverDialogResult>(discoverDevices) !=
-            DiscoverDialogResult.Ok)
+        if (!await _windowService.ShowConfirmContentDialog("Discover devices", message, "Add devices"))
             return;
 
 
-        //check if devices with one of the ip adresses already exist
+        //check if devices with the ip address already exist
         foreach ((var ipAddress, string? model) in discoverDevices)
         {
             if (_definitions.Value.Any(d => ipAddress.Equals(d.Hostname)))
@@ -76,13 +109,13 @@ public class NanoleafConfigurationDialogViewModel : PluginConfigurationViewModel
 
             _definitions.Value.Add(new DeviceDefinition
             {
-                Hostname = ipAddress.ToString(),
+                Hostname = ipAddress,
                 Model = model
             });
 
             DeviceDefinitions.Add(new DeviceDefinition
             {
-                Hostname = ipAddress.ToString(),
+                Hostname = ipAddress,
                 Model = model
             });
         }
