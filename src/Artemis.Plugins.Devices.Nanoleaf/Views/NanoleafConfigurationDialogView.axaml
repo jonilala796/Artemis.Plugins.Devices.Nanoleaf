@@ -32,12 +32,11 @@
                     <DataGridTextColumn Width="*"
                                         Binding="{Binding Model, FallbackValue='-'}"
                                         Header="Model"
-                                        IsReadOnly="True" />                    
+                                        IsReadOnly="True" />
                     <DataGridTextColumn Width="*"
                                         Binding="{Binding AuthToken, FallbackValue='-'}"
                                         Header="AuthToken"
-                                        IsReadOnly="True"
-                                        />
+                                        IsReadOnly="True" />
                     <DataGridTemplateColumn Width="Auto" IsReadOnly="True">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
@@ -54,11 +53,16 @@
                 </DataGrid.Columns>
             </DataGrid>
         </Border>
-        
+
         <Grid Grid.Row="5" ColumnDefinitions="*, Auto" VerticalAlignment="Bottom">
-            <Button Command="{CompiledBinding AddDevice}">
-                Add device
-            </Button>
+            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="5">
+                <Button Command="{CompiledBinding AddDevice}">
+                    Add device
+                </Button>
+                <Button Command="{CompiledBinding DiscoverDevices}">
+                    Discover devices
+                </Button>
+            </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="5">
                 <Button Classes="accent" Command="{CompiledBinding Save}">
                     Save changes

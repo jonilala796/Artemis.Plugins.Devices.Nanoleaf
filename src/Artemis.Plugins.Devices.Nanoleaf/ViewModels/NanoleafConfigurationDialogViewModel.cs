@@ -1,13 +1,18 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Net;
 using System.Reactive;
 using System.Threading.Tasks;
 using Artemis.Core;
 using Artemis.Core.Services;
+using Artemis.Plugins.Devices.Nanoleaf.Helper;
+using Artemis.Plugins.Devices.Nanoleaf.RGB.NET.Helper;
 using Artemis.Plugins.Devices.Nanoleaf.Settings;
 using Artemis.Plugins.Devices.Nanoleaf.ViewModels.Dialogs;
 using Artemis.UI.Shared;
 using Artemis.UI.Shared.Services;
+using DynamicData;
 using ReactiveUI;
 
 namespace Artemis.Plugins.Devices.Nanoleaf.ViewModels;
@@ -27,6 +32,7 @@ public class NanoleafConfigurationDialogViewModel : PluginConfigurationViewModel
     public ReactiveCommand<DeviceDefinition, Unit> RemoveDevice { get; }
     public ReactiveCommand<Unit, Unit> Save { get; }
     public ReactiveCommand<Unit, Unit> Cancel { get; }
+    public ReactiveCommand<Unit, Unit> DiscoverDevices { get; }
 
 
     public NanoleafConfigurationDialogViewModel(Plugin plugin, PluginSettings settings, IWindowService windowService,
@@ -45,7 +51,43 @@ public class NanoleafConfigurationDialogViewModel : PluginConfigurationViewModel
         RemoveDevice = ReactiveCommand.Create<DeviceDefinition>(ExecuteRemoveDevice);
         Save = ReactiveCommand.Create(ExecuteSave);
         Cancel = ReactiveCommand.CreateFromTask(ExecuteCancel);
+        DiscoverDevices = ReactiveCommand.CreateFromTask(ExecuteDiscoverDevices);
     }
+
+    private async Task ExecuteDiscoverDevices()
+    {
+        List<(string address, string model)> discoverDevices = NanoleafDiscoveryHelper.DiscoverDevices();
+
+        if (await _windowService
+                .ShowDialogAsync<DeviceDiscoverDialogViewModel, DiscoverDialogResult>(discoverDevices) !=
+            DiscoverDialogResult.Ok)
+            return;
+
+
+        //check if devices with one of the ip adresses already exist
+        foreach ((var ipAddress, string? model) in discoverDevices)
+        {
+            if (_definitions.Value.Any(d => ipAddress.Equals(d.Hostname)))
+                continue;
+
+
+            if (ipAddress == null)
+                continue;
+
+            _definitions.Value.Add(new DeviceDefinition
+            {
+                Hostname = ipAddress.ToString(),
+                Model = model
+            });
+
+            DeviceDefinitions.Add(new DeviceDefinition
+            {
+                Hostname = ipAddress.ToString(),
+                Model = model
+            });
+        }
+    }
+
 
     private async Task ExecuteAddDevice()
     {
@@ -53,7 +95,7 @@ public class NanoleafConfigurationDialogViewModel : PluginConfigurationViewModel
         if (await _windowService.ShowDialogAsync<DeviceConfigurationDialogViewModel, DeviceDialogResult>(device) !=
             DeviceDialogResult.Save)
             return;
-        
+
         _definitions.Value.Add(device);
         DeviceDefinitions.Add(device);
     }
