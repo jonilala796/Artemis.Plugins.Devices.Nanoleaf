@@ -77,7 +77,19 @@ public class NanoleafConfigurationDialogViewModel : PluginConfigurationViewModel
         }
         else
         {
-            device.AuthToken = authToken;
+            PluginSetting<List<DeviceDefinition>> definitions =
+                _settings.GetSetting(nameof(DeviceDefinitions), new List<DeviceDefinition>());
+            var matchedDevice = definitions.Value.FirstOrDefault(d => d.Hostname == device.Hostname);
+            if (matchedDevice != null)
+            {
+                matchedDevice.AuthToken = authToken;
+            }
+            else
+            {
+                // Fallback: update the token on the passed instance.
+                device.AuthToken = authToken;
+                definitions.Value.Add(device);
+            }
             await _windowService.ShowConfirmContentDialog("Authentication successful",
                 "You have successfully authenticated with the device");
         }
