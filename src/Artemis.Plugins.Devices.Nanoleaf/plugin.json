@@ -6,7 +6,7 @@
     "Website": "",
     "Repository": "https://github.com/jonilala796/Artemis.Plugins.Devices.Nanoleaf",
     "Icon": "Interests",
-    "Version": "1.0.0.0",
+    "Version": "1.0.1.0",
     "Main": "Artemis.Plugins.Devices.Nanoleaf.dll",
     "AutoEnableProperties": true,
     "RequiresAdmin": false,
