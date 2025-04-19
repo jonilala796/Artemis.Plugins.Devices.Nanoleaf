@@ -166,8 +166,8 @@ public class NanoleafConfigurationDialogViewModel : PluginConfigurationViewModel
 
         Task.Run(() =>
         {
-            NanoleafDeviceProvider deviceProvider = Plugin.GetFeature<NanoleafDeviceProvider>();
-            if ((deviceProvider == null || !deviceProvider.IsEnabled)) return;
+            var deviceProvider = Plugin.GetFeature<NanoleafDeviceProvider>();
+            if ((deviceProvider == null ||  !deviceProvider.IsEnabled)) return;
             _pluginManagementService.DisablePluginFeature(deviceProvider, false);
             _pluginManagementService.EnablePluginFeature(deviceProvider, false);
         });
