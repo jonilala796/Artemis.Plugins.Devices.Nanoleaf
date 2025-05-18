@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using Artemis.Core;
 using Artemis.Core.DeviceProviders;
 using Artemis.Core.Services;
@@ -30,8 +32,28 @@ public class NanoleafDeviceProvider(ILogger logger, IDeviceService deviceService
             (deviceDefinition.Hostname, deviceDefinition.Model, deviceDefinition.AuthToken)).ToList();
 
         foreach ((string hostname, string model, string authToken) in devices)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(hostname))
+                {
+                    var pingSender = new Ping();
+                    var reply = pingSender.Send(hostname, 100);
+                    if (reply.Status != IPStatus.Success)
+                    {
+                        logger.Warning("Ping to {hostname} failed with status {status}", hostname, reply.Status);
+                        continue;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Debug(e, "Ping to {hostname} failed with exception {exception}", hostname, e.Message);
+                continue;
+            }
             RgbDeviceProvider.DeviceDefinitions.Add(new NanoleafDeviceDefinition(hostname, authToken));
-        
+        }
+
         deviceService.AddDeviceProvider(this);
     }
 
