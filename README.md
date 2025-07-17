@@ -6,3 +6,4 @@ Artemis.Plugins.Devices.Nanoleaf is a plugin for the Artemis project that provid
 ## Features
 - Control Nanoleaf devices directly from Artemis.
 - Synchronize lighting effects with other devices supported by Artemis.
+- Set brightness of the Nanoleaf devices on startup
