@@ -13,7 +13,7 @@ namespace Artemis.Plugins.Devices.Nanoleaf.RGB.NET;
 /// Represents a device provider responsible for Nanoleaf devices.
 /// </summary>
 // ReSharper disable once InconsistentNaming
-public sealed class NanoleafRGBDeviceProvider : AbstractRGBDeviceProvider
+public class NanoleafRGBDeviceProvider : AbstractRGBDeviceProvider
 {
     #region Constants
 
@@ -44,6 +44,37 @@ public sealed class NanoleafRGBDeviceProvider : AbstractRGBDeviceProvider
     /// Gets a list of all defined device-definitions.
     /// </summary>
     public List<INanoleafDeviceDefinition> DeviceDefinitions { get; } = [];
+
+    #endregion
+    
+    #region Cleanup
+
+    /// <summary>
+    /// Disposes the current provider instance and clears the singleton.
+    /// </summary>
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+
+        DeviceDefinitions.Clear();
+        lock (_lock)
+            _instance = null;
+    }
+
+    /// <summary>
+    /// Resets the singleton instance if it exists.
+    /// </summary>
+    public static void ResetInstance()
+    {
+        lock (_lock)
+        {
+            if (_instance == null)
+                return;
+
+            _instance.Dispose();
+            _instance = null;
+        }
+    }
 
     #endregion
 

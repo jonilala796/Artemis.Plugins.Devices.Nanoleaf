@@ -62,6 +62,8 @@ public class NanoleafDeviceProvider(ILogger logger, IDeviceService deviceService
         deviceService.RemoveDeviceProvider(this);
 
         RgbDeviceProvider.Exception -= Provider_OnException;
+        
+        NanoleafRGBDeviceProvider.ResetInstance();
     }
 
     public override NanoleafRGBDeviceProvider RgbDeviceProvider => NanoleafRGBDeviceProvider.Instance;
