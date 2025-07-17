@@ -39,6 +39,10 @@
                                         Binding="{Binding AuthToken, FallbackValue='-'}"
                                         Header="AuthToken"
                                         IsReadOnly="True" />
+                    <DataGridTextColumn Width="*"
+                                        Binding="{Binding Brightness, FallbackValue='-'}"
+                                        Header="Brightness"
+                                        IsReadOnly="True" />
                     <DataGridTemplateColumn Width="Auto" IsReadOnly="True">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>

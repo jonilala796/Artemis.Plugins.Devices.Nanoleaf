@@ -43,6 +43,13 @@ public class
         get => _authToken;
         set => RaiseAndSetIfChanged(ref _authToken, value);
     }
+    
+    private byte _brightness;
+    public byte Brightness
+    {
+        get => _brightness;
+        set => RaiseAndSetIfChanged(ref _brightness, value);
+    }
 
     public ReactiveCommand<Unit, Unit> Save { get; }
     public ReactiveCommand<Unit, Unit> Cancel { get; }
@@ -58,6 +65,7 @@ public class
         _hostname = device.Hostname;
         _model = device.Model;
         _authToken = device.AuthToken;
+        _brightness = device.Brightness;
 
         this.ValidationRule(vm => vm.Hostname, s => !string.IsNullOrWhiteSpace(s), "A Hostname is required");
 
@@ -76,6 +84,7 @@ public class
         _device.Hostname = Hostname;
         _device.Model = Model;
         _device.AuthToken = AuthToken;
+        _device.Brightness = Brightness;
 
         Close(DeviceDialogResult.Save);
     }

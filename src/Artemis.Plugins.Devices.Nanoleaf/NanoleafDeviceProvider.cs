@@ -28,10 +28,10 @@ public class NanoleafDeviceProvider(ILogger logger, IDeviceService deviceService
             settings.GetSetting(nameof(NanoleafConfigurationDialogViewModel.DeviceDefinitions),
                 new List<DeviceDefinition>());
 
-        List<(string hostname, string model, string authToken)> devices = definitions.Value.Select(deviceDefinition =>
-            (deviceDefinition.Hostname, deviceDefinition.Model, deviceDefinition.AuthToken)).ToList();
+        List<(string Hostname, string Model, string AuthToken, byte Brightness)> devices = definitions.Value.Select(deviceDefinition =>
+            (deviceDefinition.Hostname, deviceDefinition.Model, deviceDefinition.AuthToken, deviceDefinition.Brightness)).ToList();
 
-        foreach ((string hostname, string model, string authToken) in devices)
+        foreach ((string hostname, string model, string authToken, byte brightness) in devices)
         {
             try
             {
@@ -51,7 +51,7 @@ public class NanoleafDeviceProvider(ILogger logger, IDeviceService deviceService
                 logger.Debug(e, "Ping to {hostname} failed with exception {exception}", hostname, e.Message);
                 continue;
             }
-            RgbDeviceProvider.DeviceDefinitions.Add(new NanoleafDeviceDefinition(hostname, authToken));
+            RgbDeviceProvider.DeviceDefinitions.Add(new NanoleafDeviceDefinition(hostname, authToken, brightness));
         }
 
         deviceService.AddDeviceProvider(this);

@@ -65,6 +65,32 @@ namespace Artemis.Plugins.Devices.Nanoleaf.RGB.NET.API
         }
 
         /// <summary>
+        /// Sets the brightness of the Nanoleaf device.
+        /// </summary>
+        /// <param name="address">The address of the device to set the brightness for.</param>
+        /// <param name="authToken">The authentication token of the device.</param>
+        /// <param name="brightness">The brightness value to set (0-100).</param>
+        public static void SetBrightness(string address, string authToken, byte brightness)
+        {
+            if (string.IsNullOrEmpty(address) || string.IsNullOrEmpty(authToken) || brightness > 100) return;
+
+            using HttpClient client = new();
+            try
+            {
+                var uri = new UriBuilder("http", address, 16021, $"/api/v1/{authToken}/state/brightness").Uri;
+                var request = new HttpRequestMessage(HttpMethod.Put, uri)
+                {
+                    Content = JsonContent.Create(new { brightness = new { value = brightness } })
+                };
+                client.Send(request);
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+
+        /// <summary>
         /// Starts external control on the Nanoleaf device.
         /// </summary>
         /// <param name="address">The address of the device to control.</param>

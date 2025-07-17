@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading;
 using Artemis.Plugins.Devices.Nanoleaf.RGB.NET.API;
-using Artemis.Plugins.Devices.Nanoleaf.RGB.NET.Enum;
 using Artemis.Plugins.Devices.Nanoleaf.RGB.NET.Generic;
 using Artemis.Plugins.Devices.Nanoleaf.RGB.NET.Helper;
 using RGB.NET.Core;
@@ -93,6 +92,8 @@ public sealed class NanoleafRGBDeviceProvider : AbstractRGBDeviceProvider
     {
         NanoleafInfo? nanoleafInfo = NanoleafAPI.Info(deviceDefinition.Address, deviceDefinition.AuthToken);
         if (nanoleafInfo == null) return null;
+        
+        NanoleafAPI.SetBrightness(deviceDefinition.Address, deviceDefinition.AuthToken, deviceDefinition.Brightness);
 
         var startExtControl = NanoleafAPI.StartExternalControl(deviceDefinition.Address, deviceDefinition.AuthToken,
             nanoleafInfo.PanelLayout.Layout.PositionData[0].ShapeType.GetExtControlVersion());

@@ -122,13 +122,15 @@ public class NanoleafConfigurationDialogViewModel : PluginConfigurationViewModel
             _definitions.Value.Add(new DeviceDefinition
             {
                 Hostname = ipAddress,
-                Model = model
+                Model = model,
+                Brightness = 100
             });
 
             DeviceDefinitions.Add(new DeviceDefinition
             {
                 Hostname = ipAddress,
-                Model = model
+                Model = model,
+                Brightness = 100
             });
         }
     }

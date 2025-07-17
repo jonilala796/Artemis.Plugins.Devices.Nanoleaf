@@ -7,6 +7,6 @@ public interface INanoleafDeviceDefinition
 {
     string Address { get; }
     string AuthToken { get; }
-    
+    byte Brightness { get; }
     
 }
