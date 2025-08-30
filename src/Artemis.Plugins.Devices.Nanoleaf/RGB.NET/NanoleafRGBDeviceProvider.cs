@@ -121,8 +121,9 @@ public class NanoleafRGBDeviceProvider : AbstractRGBDeviceProvider
     private static NanoleafRGBDevice? CreateNanoleafDevice(INanoleafDeviceDefinition deviceDefinition,
         IDeviceUpdateTrigger updateTrigger)
     {
-        NanoleafInfo? nanoleafInfo = NanoleafAPI.Info(deviceDefinition.Address, deviceDefinition.AuthToken);
+        var nanoleafInfo = NanoleafAPI.Info(deviceDefinition.Address, deviceDefinition.AuthToken);
         if (nanoleafInfo == null) return null;
+        if (nanoleafInfo.State.On.Value && nanoleafInfo.Effects.Select == "*ExtControl*") return null;
         
         NanoleafAPI.SetBrightness(deviceDefinition.Address, deviceDefinition.AuthToken, deviceDefinition.Brightness);
 
