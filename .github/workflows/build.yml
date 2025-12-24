@@ -34,5 +34,5 @@ jobs:
         run: dotnet tool install ArtemisRGB.Tools.PluginUploader --global
 
       - name: Upload
-        if: github.ref == 'refs/heads/mein'
+        if: github.ref == 'refs/heads/main'
         run: artemis-plugin-uploader upload-all --pat ${{ secrets.WORKSHOP_PAT }} --folder src/Artemis.Plugins.Devices.Nanoleaf/bin/x64/Release/net10.0/publish
