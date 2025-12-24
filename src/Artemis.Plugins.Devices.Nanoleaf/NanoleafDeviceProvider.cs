@@ -25,7 +25,7 @@ public class NanoleafDeviceProvider(ILogger logger, IDeviceService deviceService
         RgbDeviceProvider.DeviceDefinitions.Clear();
 
         PluginSetting<List<DeviceDefinition>> definitions =
-            settings.GetSetting(nameof(NanoleafConfigurationDialogViewModel.DeviceDefinitions),
+            settings.GetSetting(nameof(NanoleafConfigurationViewModel.DeviceDefinitions),
                 new List<DeviceDefinition>());
 
         List<(string Hostname, string Model, string AuthToken, byte Brightness)> devices = definitions.Value.Select(deviceDefinition =>
