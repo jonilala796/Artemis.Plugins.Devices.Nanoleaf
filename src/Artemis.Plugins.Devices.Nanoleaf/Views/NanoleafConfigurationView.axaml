@@ -5,8 +5,8 @@
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:viewmodels="clr-namespace:Artemis.Plugins.Devices.Nanoleaf.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Artemis.Plugins.Devices.Nanoleaf.Views.NanoleafConfigurationDialogView"
-             x:DataType="viewmodels:NanoleafConfigurationDialogViewModel">
+             x:Class="Artemis.Plugins.Devices.Nanoleaf.Views.NanoleafConfigurationView"
+             x:DataType="viewmodels:NanoleafConfigurationViewModel">
     <Grid RowDefinitions="Auto,Auto,300,Auto,Auto,*">
         <Grid Grid.Row="0" Classes="plugin-introduction" ColumnDefinitions="*, Auto">
             <TextBlock Grid.Column="0" TextWrapping="Wrap">

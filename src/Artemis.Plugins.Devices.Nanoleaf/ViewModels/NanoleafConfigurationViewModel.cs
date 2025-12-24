@@ -18,7 +18,7 @@ using ReactiveUI;
 
 namespace Artemis.Plugins.Devices.Nanoleaf.ViewModels;
 
-public class NanoleafConfigurationDialogViewModel : PluginConfigurationViewModel
+public class NanoleafConfigurationViewModel : PluginConfigurationViewModel
 {
     private readonly PluginSetting<List<DeviceDefinition>> _definitions;
     private readonly IPluginManagementService _pluginManagementService;
@@ -37,7 +37,7 @@ public class NanoleafConfigurationDialogViewModel : PluginConfigurationViewModel
     public ReactiveCommand<DeviceDefinition, Unit> AuthenticateDevice { get; }
 
 
-    public NanoleafConfigurationDialogViewModel(Plugin plugin, PluginSettings settings, IWindowService windowService,
+    public NanoleafConfigurationViewModel(Plugin plugin, PluginSettings settings, IWindowService windowService,
         IPluginManagementService pluginManagementService) : base(plugin)
     {
         _settings = settings;

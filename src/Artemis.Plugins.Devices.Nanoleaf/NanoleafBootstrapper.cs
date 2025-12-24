@@ -8,6 +8,6 @@ public class NanoleafBootstrapper : PluginBootstrapper
 {
     public override void OnPluginLoaded(Plugin plugin)
     {
-        plugin.ConfigurationDialog = new PluginConfigurationDialog<NanoleafConfigurationDialogViewModel>();
+        plugin.ConfigurationDialog = new PluginConfigurationDialog<NanoleafConfigurationViewModel>();
     }
 }
