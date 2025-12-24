@@ -3,7 +3,6 @@
     "Name": "Nanoleaf Devices",
     "Description": "Allows Artemis to control lighting on all Nanoleaf products",
     "Author": "jonilala796",
-    "Website": "",
     "Repository": "https://github.com/jonilala796/Artemis.Plugins.Devices.Nanoleaf",
     "Icon": "Interests",
     "Version": "2.0.0.0",
