@@ -16,7 +16,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '9.0.x'
+          dotnet-version: '10.0.x'
 
       - name: Clone
         uses: actions/checkout@v2
@@ -28,11 +28,11 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Artemis.Plugins.Devices.Nanoleaf
-          path: src/Artemis.Plugins.Devices.Nanoleaf/bin/x64/Release/net9.0/publish
+          path: src/Artemis.Plugins.Devices.Nanoleaf/bin/x64/Release/net10.0/publish
 
       - name: Install Plugin Uploader
         run: dotnet tool install ArtemisRGB.Tools.PluginUploader --global
 
       - name: Upload
         if: github.ref == 'refs/heads/mein'
-        run: artemis-plugin-uploader upload-all --pat ${{ secrets.WORKSHOP_PAT }} --folder src
+        run: artemis-plugin-uploader upload-all --pat ${{ secrets.WORKSHOP_PAT }} --folder src/Artemis.Plugins.Devices.Nanoleaf/bin/x64/Release/net10.0/publish
