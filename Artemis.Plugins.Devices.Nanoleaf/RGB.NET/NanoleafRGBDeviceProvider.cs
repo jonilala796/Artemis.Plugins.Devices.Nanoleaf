@@ -45,8 +45,10 @@ public class NanoleafRGBDeviceProvider : AbstractRGBDeviceProvider
     /// </summary>
     public List<INanoleafDeviceDefinition> DeviceDefinitions { get; } = [];
 
+    private static readonly Dictionary<INanoleafDeviceDefinition, NanoleafInfo> OldStates = new();
+
     #endregion
-    
+
     #region Cleanup
 
     /// <summary>
@@ -54,11 +56,20 @@ public class NanoleafRGBDeviceProvider : AbstractRGBDeviceProvider
     /// </summary>
     protected override void Dispose(bool disposing)
     {
-        base.Dispose(disposing);
-
-        DeviceDefinitions.Clear();
         lock (_lock)
+        {
+            base.Dispose(disposing);
+
+            foreach (var deviceDefinition in DeviceDefinitions)
+            {
+                RestoreOldNanoleafState(deviceDefinition);
+            }
+
+            DeviceDefinitions.Clear();
+            OldStates.Clear();
+
             _instance = null;
+        }
     }
 
     /// <summary>
@@ -124,7 +135,10 @@ public class NanoleafRGBDeviceProvider : AbstractRGBDeviceProvider
         var nanoleafInfo = NanoleafAPI.Info(deviceDefinition.Address, deviceDefinition.AuthToken);
         if (nanoleafInfo == null) return null;
         if (nanoleafInfo.State.On.Value && nanoleafInfo.Effects.Select == "*ExtControl*") return null;
-        
+
+        // Store the initial state info for restoring later
+        OldStates[deviceDefinition] = nanoleafInfo;
+
         NanoleafAPI.SetBrightness(deviceDefinition.Address, deviceDefinition.AuthToken, deviceDefinition.Brightness);
 
         var startExtControl = NanoleafAPI.StartExternalControl(deviceDefinition.Address, deviceDefinition.AuthToken,
@@ -132,6 +146,28 @@ public class NanoleafRGBDeviceProvider : AbstractRGBDeviceProvider
 
         return new NanoleafRGBDevice(new NanoleafRGBDeviceInfo(nanoleafInfo), startExtControl.address,
             startExtControl.port, updateTrigger);
+    }
+
+    private static void RestoreOldNanoleafState(INanoleafDeviceDefinition deviceDefinition)
+    {
+        if (!OldStates.Remove(deviceDefinition, out var oldStateInfo))
+            return;
+
+        string oldEffect = oldStateInfo.Effects.Select;
+
+        // Restore old effect and state
+
+        if (oldEffect.Contains('*'))
+        {
+            NanoleafAPI.SetState(deviceDefinition.Address, deviceDefinition.AuthToken, oldStateInfo.State);
+        }
+        else
+        {
+            NanoleafAPI.SetEffect(deviceDefinition.Address, deviceDefinition.AuthToken, oldEffect);
+            NanoleafAPI.SetBrightness(deviceDefinition.Address, deviceDefinition.AuthToken,
+                oldStateInfo.State.Brightness.Value);
+            NanoleafAPI.SetOnOff(deviceDefinition.Address, deviceDefinition.AuthToken, oldStateInfo.State.On.Value);
+        }
     }
 
     protected override IDeviceUpdateTrigger CreateUpdateTrigger(int id, double updateRateHardLimit) =>

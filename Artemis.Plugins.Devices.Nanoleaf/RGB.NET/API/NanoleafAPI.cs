@@ -52,11 +52,11 @@ namespace Artemis.Plugins.Devices.Nanoleaf.RGB.NET.API
             {
                 var uri = new UriBuilder("http", address, 16021, "/api/v1/new").Uri;
                 return client.Send(new HttpRequestMessage(HttpMethod.Post, uri))
-                           .Content
-                           .ReadFromJsonAsync<NanoleafAuthenticationResponse>()
-                           .Result?
-                           .AuthToken
-                       ?? string.Empty;
+                        .Content
+                        .ReadFromJsonAsync<NanoleafAuthenticationResponse>()
+                        .Result?
+                        .AuthToken
+                    ?? string.Empty;
             }
             catch
             {
@@ -89,7 +89,94 @@ namespace Artemis.Plugins.Devices.Nanoleaf.RGB.NET.API
                 // ignored
             }
         }
+        
+        /// <summary>
+        /// Sets the on/off state of the Nanoleaf device.
+        /// </summary>
+        /// <param name="address">The address of the device to set the state for.</param>
+        /// <param name="authToken">The authentication token of the device.</param>
+        /// <param name="on">True to turn the device on, false to turn it off.</param>
+        public static void SetOnOff(string address, string authToken, bool on)
+        {
+            if (string.IsNullOrEmpty(address) || string.IsNullOrEmpty(authToken)) return;
 
+            using HttpClient client = new();
+            try
+            {
+                var uri = new UriBuilder("http", address, 16021, $"/api/v1/{authToken}/state/on").Uri;
+                var request = new HttpRequestMessage(HttpMethod.Put, uri)
+                {
+                    Content = JsonContent.Create(new { on = new { value = on } })
+                };
+                client.Send(request);
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+        
+        /// <summary>
+        /// Sets the effect of the Nanoleaf device.
+        /// </summary>
+        /// <param name="address">The address of the device to set the effect for.</param>
+        /// <param name="authToken">The authentication token of the device.</param>
+        /// <param name="effectName">The name of the effect to set.</param>
+        public static void SetEffect(string address, string authToken, string effectName)
+        {
+            if (string.IsNullOrEmpty(address) || string.IsNullOrEmpty(authToken) || string.IsNullOrEmpty(effectName)) return;
+
+            using HttpClient client = new();
+            try
+            {
+                var uri = new UriBuilder("http", address, 16021, $"/api/v1/{authToken}/effects").Uri;
+                var request = new HttpRequestMessage(HttpMethod.Put, uri)
+                {
+                    Content = JsonContent.Create(new
+                    {
+                        select = effectName
+                    })
+                };
+                client.Send(request);
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+
+        /// <summary>
+        /// Sets the state of the Nanoleaf device.
+        /// </summary>
+        /// <param name="address">The address of the device to set the state for.</param>
+        /// <param name="authToken">The authentication token of the device.</param>
+        /// <param name="stateInfo">The state information to set.</param>
+        public static void SetState(string address, string authToken, NanoleafInfo.StateInfo? stateInfo)
+        {
+            if (string.IsNullOrEmpty(address) || string.IsNullOrEmpty(authToken) || stateInfo == null) return;
+            using HttpClient client = new();
+            try
+            {
+                var uri = new UriBuilder("http", address, 16021, $"/api/v1/{authToken}/state").Uri;
+                var request = new HttpRequestMessage(HttpMethod.Put, uri)
+                {
+                    Content = JsonContent.Create(new
+                    {
+                        brightness = new { value = stateInfo.Brightness.Value },
+                        ct = new { value = stateInfo.Ct.Value },
+                        hue = new { value = stateInfo.Hue.Value },
+                        sat = new { value = stateInfo.Sat.Value },
+                        on = new { value = stateInfo.On.Value }
+                    })
+                };
+                client.Send(request);
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+        
         /// <summary>
         /// Starts external control on the Nanoleaf device.
         /// </summary>
